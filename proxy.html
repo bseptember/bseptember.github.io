@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Proxy Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <script>
+        // Function to extract query parameters from the URL
+        function getUrlParams(url) {
+            const params = {};
+            const paramArray = url.slice(url.indexOf('?') + 1).split('&');
+            paramArray.forEach(param => {
+                const [key, value] = param.split('=');
+                params[key] = value;
+            });
+            return params;
+        }
+
+        // Set the CORS proxy URL
+        const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
+
+        // Make a request to your server-side API to retrieve the necessary parameters
+        $.ajax({
+            url: 'https://192.168.8.162:8000/parameters',
+            method: 'GET',
+            crossDomain: true, // Include this option to allow cross-origin requests
+            xhrFields: {
+				withCredentials: true // Include this option to send cookies along with the request
+			},
+			headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            },
+            success: function(response) {
+                const { client_id, redirect_uri, response_type, scope, state } = response;
+
+                // Build the Google Accounts API URL with the CORS proxy
+                const googleAccountsApiUrl = `${corsProxyUrl}https://accounts.google.com/o/oauth2/auth?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=${response_type}&scope=${encodeURIComponent(scope)}&state=${state}`;
+
+                // Redirect the user to the Google Accounts API URL
+                window.location.href = googleAccountsApiUrl;
+            },
+            error: function(error) {
+                console.error('Failed to retrieve parameters:', error);
+                // Handle error condition
+            }
+        });
+    </script>
+</body>
+</html>
