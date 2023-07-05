@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OAuth Callback</title>
+</head>
+<body>
+  <script>
+    // Extract the authorization code from the URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Redirect to your server-side callback URL with the authorization code as a query parameter
+    const serverUrl = 'http://192.168.1.36:8080/auth/realms/Erisco/broker/microsoft/endpoint';
+    const redirectUrl = `${serverUrl}`;
+    window.location.href = redirectUrl;
+  </script>
+</body>
+</html>
