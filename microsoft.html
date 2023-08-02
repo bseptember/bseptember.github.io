@@ -9,7 +9,7 @@
     const urlParams = new URLSearchParams(window.location.search);
 
     // Redirect to your server-side callback URL with the authorization code as a query parameter
-    const serverUrl = 'http://192.168.1.36:8080/auth/realms/Erisco/broker/microsoft/endpoint';
+    const serverUrl = 'http://192.168.1.40:8080/realms/Erisco/broker/microsoft/endpoint';
     const redirectUrl = `${serverUrl}`;
     window.location.href = redirectUrl;
   </script>
