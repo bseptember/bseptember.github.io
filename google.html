@@ -5,23 +5,23 @@
 </head>
 <body>
   <script>
-    // Generate a unique state value
+    // Function to generate a unique state value for CSRF protection
     const generateState = () => {
-      // Code to generate a unique state value
-      return 'generated_state_value';
+      // Implement the code to generate a unique state value here
+      return Math.random().toString(36).substring(7);
     };
 
-    // Generate the device_id and device_state parameters
+    // Generate the device_id and device_name parameters
     const device_id = '1234567890id';
     const device_name = 'EHSLock';
-    const device_state = generateState();
+    const state = generateState();
     console.log('Device ID:', device_id);
     console.log('Device State:', device_state);
     console.log('Device Name:', device_name);
 
-    // Redirect to your server-side callback URL with the device parameters as query parameters
+    // Redirect to the server-side callback URL with the device parameters as query parameters
     const serverUrl = 'http://192.168.1.40:8080/realms/Erisco/broker/google/endpoint';
-    const redirectUrl = `${serverUrl}?device_id=${device_id}&device_name=${device_name}&device_state=${device_state}`;
+    const redirectUrl = `${serverUrl}?device_id=${device_id}&device_name=${device_name}&state=${state}`;
     window.location.href = redirectUrl;
   </script>
 </body>
