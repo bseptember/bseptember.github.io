@@ -5,15 +5,14 @@
 </head>
 <body>
   <script>
-   // Extract the authorization code from the URL query parameters
+    // Extract the authorization code from the URL query parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const device_id = urlParams.get('device_id');
-    const device_name = urlParams.get('device_name');
-    const state = urlParams.get('state');
+    const code = urlParams.get('code');
+    console.log('Authorization code:', code);
 
     // Redirect to your server-side callback URL with the authorization code as a query parameter
     const serverUrl = 'https://192.168.1.33:8443/realms/Erisco/broker/google/endpoint';
-    const redirectUrl = `${serverUrl}?device_id=${device_id}&device_name=${device_name}&state=${state}`;
+    const redirectUrl = `${serverUrl}?code=${code}`;
     window.location.href = redirectUrl;
   </script>
 </body>
