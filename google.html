@@ -20,7 +20,7 @@
     console.log('Device Name:', device_name);
 
     // Redirect to the server-side callback URL with the device parameters as query parameters
-    const serverUrl = 'http://192.168.1.40:8080/realms/Erisco/broker/google/endpoint';
+    const serverUrl = 'https://192.168.1.33:8443/realms/Erisco/broker/google/endpoint';
     const redirectUrl = `${serverUrl}?device_id=${device_id}&device_name=${device_name}&state=${state}`;
     window.location.href = redirectUrl;
   </script>
