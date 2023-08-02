@@ -5,14 +5,23 @@
 </head>
 <body>
   <script>
-    // Extract the authorization code from the URL query parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    console.log('Authorization code:', code);
+    // Generate a unique state value
+    const generateState = () => {
+      // Code to generate a unique state value
+      return 'generated_state_value';
+    };
 
-    // Redirect to your server-side callback URL with the authorization code as a query parameter
+    // Generate the device_id and device_state parameters
+    const device_id = '1234567890id';
+    const device_name = 'EHSLock';
+    const device_state = generateState();
+    console.log('Device ID:', device_id);
+    console.log('Device State:', device_state);
+    console.log('Device Name:', device_name);
+
+    // Redirect to your server-side callback URL with the device parameters as query parameters
     const serverUrl = 'https://192.168.1.33:8443/realms/Erisco/broker/google/endpoint';
-    const redirectUrl = `${serverUrl}?code=${code}`;
+    const redirectUrl = `${serverUrl}?device_id=${device_id}&device_name=${device_name}&device_state=${device_state}`;
     window.location.href = redirectUrl;
   </script>
 </body>
