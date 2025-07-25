@@ -17,30 +17,32 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(1);
       user-select: none;
       cursor: pointer;
       z-index: 1;
+      transition: transform 0.2s ease-in-out;
     }
 
     #clickOverlay {
       position: fixed;
-      top: 10%;   /* slightly down from top for better visibility */
-      left: 0;    /* start from left */
-      background: rgba(0,0,0,0.4);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      z-index: 2;
-      user-select: none;
+      top: 10%;
+      left: 0;
+      background: rgba(0,0,0,0.6);
+      color: white;
       padding: 1rem 2rem;
-      white-space: nowrap; /* prevent wrapping */
+      font-size: clamp(1rem, 2vw, 2rem);
       border-radius: 8px;
-      max-width: 90vw;
-      transform: translateX(0); /* reset transform */
+      white-space: nowrap;
+      z-index: 2;
+      cursor: pointer;
+      animation: moveText 15s linear infinite;
+      user-select: none;
+    }
+
+    @keyframes moveText {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(100vw); }
     }
   </style>
 </head>
@@ -52,35 +54,50 @@
 
   <div id="clickOverlay">Click anywhere to enjoy the full experience</div>
 
-<script>
-  const video = document.getElementById('video');
-  const overlay = document.getElementById('clickOverlay');
-  let unmuted = false;
+  <script>
+    const video = document.getElementById('video');
+    const overlay = document.getElementById('clickOverlay');
+    let unmuted = false;
 
-  const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-  const isEdge = /Edg/.test(navigator.userAgent);
-  const isFirefox = typeof InstallTrigger !== 'undefined';
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    const isEdge = /Edg/.test(navigator.userAgent);
+    const isFirefox = typeof InstallTrigger !== 'undefined';
 
-  function activateAudio() {
-    if (!unmuted) {
-      video.muted = false;
-      video.volume = 1.0;
-      video.play().catch(console.warn);
-      unmuted = true;
+    function triggerZoom(times) {
+      let count = 0;
+
+      const interval = setInterval(() => {
+        video.style.transform = 'translate(-50%, -50%) scale(10)';
+        setTimeout(() => {
+          video.style.transform = 'translate(-50%, -50%) scale(1)';
+        }, 300); // back to normal after 300ms
+
+        count++;
+        if (count >= times) {
+          clearInterval(interval);
+        }
+      }, 1000); // every 1 second
+    }
+
+    function activateAudio() {
+      if (!unmuted) {
+        video.muted = false;
+        video.volume = 1.0;
+        video.play().catch(console.warn);
+        unmuted = true;
+        overlay.style.display = 'none';
+        triggerZoom(3); // trigger zoom effect 3 times
+      }
+    }
+
+    if (isChrome || isEdge || isFirefox) {
+      video.addEventListener('click', activateAudio);
+      overlay.addEventListener('click', activateAudio);
+    } else {
+      document.addEventListener('mousemove', activateAudio, { once: true });
+      document.addEventListener('click', activateAudio, { once: true });
       overlay.style.display = 'none';
     }
-  }
-
-  if (isChrome || isEdge || isFirefox) {
-    // Add click listener on both video and overlay
-    video.addEventListener('click', activateAudio);
-    overlay.addEventListener('click', activateAudio);
-  } else {
-    document.addEventListener('mousemove', activateAudio, { once: true });
-    document.addEventListener('click', activateAudio, { once: true });
-    overlay.style.display = 'none';
-  }
-</script>
-  
+  </script>
 </body>
 </html>
