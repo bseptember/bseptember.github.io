@@ -21,10 +21,11 @@
       user-select: none;
       cursor: pointer;
       z-index: 1;
-      transition: transform 0.1s ease-in-out, all 1.5s ease-in-out;
+      transition: transform 0.1s ease-in-out /*, all 1.5s ease-in-out*/; /* cinematic transition commented */
     }
 
     /* Cinematic widescreen aspect ratio after zoom */
+    /*
     video.cinematic {
       width: 100vw;
       height: 42.5vw; /* approx 2.35:1 aspect ratio */
@@ -32,6 +33,7 @@
       object-fit: cover;
       transition: all 1.5s ease-in-out;
     }
+    */
 
     #clickOverlay {
       position: fixed;
@@ -84,9 +86,11 @@
         if (count >= times) {
           clearInterval(interval);
           // After last zoom, apply cinematic mode with smooth transition
+          /*
           setTimeout(() => {
             video.classList.add('cinematic');
-          }, 300); 
+          }, 300);
+          */
         }
       }, 300); // zoom cycles every 300ms (fast & snappy)
     }
