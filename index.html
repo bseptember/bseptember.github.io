@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Loading...</title>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: black;
-      overflow: hidden;
+      margin: 0; padding: 0; height: 100%; background: black; overflow: hidden;
+      display: flex; justify-content: center; align-items: center;
+      color: white; font-family: Arial, sans-serif;
     }
 
     video {
@@ -22,17 +20,36 @@
       transform: translate(-50%, -50%);
       user-select: none;
       cursor: pointer;
+      z-index: 1;
+    }
+
+    #clickOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      z-index: 2;
+      user-select: none;
+      padding: 1rem;
     }
   </style>
 </head>
 <body>
   <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
-    <source src="media_asset" type="video/mp4">
+    <source src="media_asset" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 
+  <div id="clickOverlay">Click anywhere to enable sound for full experience</div>
+
   <script>
     const video = document.getElementById('video');
+    const overlay = document.getElementById('clickOverlay');
     let unmuted = false;
 
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
@@ -45,16 +62,18 @@
         video.volume = 1.0;
         video.play().catch(console.warn);
         unmuted = true;
+        overlay.style.display = 'none';
       }
     }
 
     if (isChrome || isEdge || isFirefox) {
-      // For Chrome, Edge, and Firefox, only unmute on click
-      video.addEventListener('click', activateAudio);
+      // Show overlay and only unmute on click anywhere
+      overlay.addEventListener('click', activateAudio);
     } else {
-      // For other browsers, unmute on first mousemove or click
+      // Other browsers: unmute on mousemove or click
       document.addEventListener('mousemove', activateAudio, { once: true });
       document.addEventListener('click', activateAudio, { once: true });
+      overlay.style.display = 'none'; // Hide overlay on other browsers
     }
   </script>
 </body>
