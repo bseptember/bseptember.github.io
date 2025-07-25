@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Loading...</title>
   <style>
-    /* Optional: hide controls, disable right-click */
+    /* Optional: hide controls, disable right-click, prevent text selection */
     video {
       width: 100%;
       user-select: none;
@@ -16,20 +16,33 @@
   </style>
 </head>
 <body>
-  <video autoplay loop muted playsinline oncontextmenu="return false;">
-    <source src="media_asset" type="video/mp4" />
+  <video id="myVideo" autoplay loop muted playsinline oncontextmenu="return false;">
+    <source src="media_asset.mp4" type="video/mp4" />
     Sorry, your browser doesn't support embedded videos.
   </video>
 
   <script>
-    // Change page title, hide any direct video references in JS
+    // Change page title
     const pageTitle = "Loading...";
 
     function setTitle() {
       document.title = pageTitle;
     }
 
+    // On page load, set title
     window.onload = setTitle;
+
+    // Unmute video on hover, mute when mouse leaves
+    const video = document.getElementById('myVideo');
+
+    video.addEventListener('mouseenter', () => {
+      video.muted = false;
+      video.play();
+    });
+
+    video.addEventListener('mouseleave', () => {
+      video.muted = true;
+    });
   </script>
 </body>
 </html>
