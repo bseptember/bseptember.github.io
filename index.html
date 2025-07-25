@@ -5,9 +5,16 @@
   <title>Loading...</title>
   <style>
     html, body {
-      margin: 0; padding: 0; height: 100%; background: black; overflow: hidden;
-      display: flex; justify-content: center; align-items: center;
-      color: white; font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-family: Arial, sans-serif;
     }
 
     video {
@@ -38,16 +45,17 @@
       cursor: pointer;
       animation: moveText 10s linear infinite;
       user-select: none;
+      pointer-events: none; /* Allows clicking through to video */
     }
 
     @keyframes moveText {
-      0% { transform: translateX(0); }
+      0% { transform: translateX(-100%); }
       100% { transform: translateX(100vw); }
     }
   </style>
 </head>
 <body>
-  <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
+  <video id="video" autoplay muted playsinline loop preload="auto" oncontextmenu="return false">
     <source src="media_asset" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
@@ -69,13 +77,13 @@
         video.style.transform = 'translate(-50%, -50%) scale(10)';
         setTimeout(() => {
           video.style.transform = 'translate(-50%, -50%) scale(1)';
-        }, 100); // zoom in duration: 100ms
+        }, 100); // zoom in for 100ms
 
         count++;
         if (count >= times) {
           clearInterval(interval);
         }
-      }, 500); // run every 500ms (total 2s if 4 times)
+      }, 500); // every 500ms → 3 times = 1.5s
     }
 
     function activateAudio() {
@@ -85,7 +93,7 @@
         video.play().catch(console.warn);
         unmuted = true;
         overlay.style.display = 'none';
-        triggerZoom(4); // 4 times for 2 seconds total
+        triggerZoom(3); // Zoom 3 times
       }
     }
 
