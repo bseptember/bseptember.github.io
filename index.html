@@ -12,11 +12,15 @@
       overflow: hidden;
     }
     video {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 60vw;
+      height: 60vh;
       object-fit: cover;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      user-select: none;
+      pointer-events: none; /* Optional: prevent hover issues */
     }
   </style>
 </head>
@@ -41,8 +45,6 @@
       }
     }
 
-    // Autoplay video (loop) begins muted
-    // Unmute on first mouse move or click anywhere in the window
     document.addEventListener('mousemove', activateAudio, { once: true });
     document.addEventListener('click', activateAudio, { once: true });
   </script>
