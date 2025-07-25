@@ -4,45 +4,53 @@
   <meta charset="UTF-8" />
   <title>Loading...</title>
   <style>
-    /* Optional: hide controls, disable right-click, prevent text selection */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+    }
+
     video {
-      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
       user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      -o-user-select: none;
     }
   </style>
 </head>
 <body>
-  <video id="myVideo" autoplay loop muted playsinline oncontextmenu="return false;">
+  <video id="rickVideo" autoplay loop muted playsinline oncontextmenu="return false">
     <source src="media_asset" type="video/mp4" />
     Sorry, your browser doesn't support embedded videos.
   </video>
 
   <script>
-    // Change page title
-    const pageTitle = "Loading...";
+    const video = document.getElementById('rickVideo');
 
-    function setTitle() {
-      document.title = pageTitle;
+    let unmuted = false;
+
+    function enableAudioOnInteraction() {
+      if (!unmuted) {
+        video.muted = false;
+        video.play(); // Ensure it's playing
+        unmuted = true;
+
+        // Optional: remove the event listener once unmuted
+        document.removeEventListener('mousemove', enableAudioOnInteraction);
+      }
     }
 
-    // On page load, set title
-    window.onload = setTitle;
+    // Set page title
+    window.onload = () => {
+      document.title = "Loading...";
+    };
 
-    // Unmute video on hover, mute when mouse leaves
-    const video = document.getElementById('myVideo');
-
-    video.addEventListener('mouseenter', () => {
-      video.muted = false;
-      video.play();
-    });
-
-    video.addEventListener('mouseleave', () => {
-      video.muted = true;
-    });
+    // Listen for first mouse movement over the video
+    document.addEventListener('mousemove', enableAudioOnInteraction);
   </script>
 </body>
 </html>
