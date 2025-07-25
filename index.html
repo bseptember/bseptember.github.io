@@ -78,18 +78,17 @@
         video.style.transform = 'translate(-50%, -50%) scale(10)';
         setTimeout(() => {
           video.style.transform = 'translate(-50%, -50%) scale(1)';
-        }, 100); // zoom in for 100ms
+        }, 100); // zoom in duration: 100ms
 
         count++;
         if (count >= times) {
           clearInterval(interval);
-
-          // After last zoom, apply cinematic mode after short delay
+          // After last zoom, apply cinematic mode with smooth transition
           setTimeout(() => {
             video.classList.add('cinematic');
-          }, 600); 
+          }, 300); 
         }
-      }, 300); // zoom cycles every 300ms (faster & snappier)
+      }, 300); // zoom cycles every 300ms (fast & snappy)
     }
 
     function activateAudio() {
