@@ -5,16 +5,9 @@
   <title>Loading...</title>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: black;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-family: Arial, sans-serif;
+      margin: 0; padding: 0; height: 100%; background: black; overflow: hidden;
+      display: flex; justify-content: center; align-items: center;
+      color: white; font-family: Arial, sans-serif;
     }
 
     video {
@@ -28,7 +21,16 @@
       user-select: none;
       cursor: pointer;
       z-index: 1;
-      transition: transform 0.1s ease-in-out;
+      transition: transform 0.1s ease-in-out, all 1.5s ease-in-out;
+    }
+
+    /* Cinematic widescreen aspect ratio after zoom */
+    video.cinematic {
+      width: 100vw;
+      height: 42.5vw; /* approx 2.35:1 aspect ratio */
+      max-height: 100vh;
+      object-fit: cover;
+      transition: all 1.5s ease-in-out;
     }
 
     #clickOverlay {
@@ -45,17 +47,16 @@
       cursor: pointer;
       animation: moveText 10s linear infinite;
       user-select: none;
-      pointer-events: none; /* Allows clicking through to video */
     }
 
     @keyframes moveText {
-      0% { transform: translateX(-100%); }
+      0% { transform: translateX(0); }
       100% { transform: translateX(100vw); }
     }
   </style>
 </head>
 <body>
-  <video id="video" autoplay muted playsinline loop preload="auto" oncontextmenu="return false">
+  <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
     <source src="media_asset" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
@@ -82,8 +83,13 @@
         count++;
         if (count >= times) {
           clearInterval(interval);
+
+          // After last zoom, apply cinematic mode after short delay
+          setTimeout(() => {
+            video.classList.add('cinematic');
+          }, 600); 
         }
-      }, 500); // every 500ms → 3 times = 1.5s
+      }, 300); // zoom cycles every 300ms (faster & snappier)
     }
 
     function activateAudio() {
@@ -93,7 +99,7 @@
         video.play().catch(console.warn);
         unmuted = true;
         overlay.style.display = 'none';
-        triggerZoom(3); // Zoom 3 times
+        triggerZoom(3); // 3 zoom cycles
       }
     }
 
