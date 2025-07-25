@@ -10,27 +10,35 @@
       color: white; font-family: Arial, sans-serif;
     }
 
-    video {
-      width: 95vw;
-      height: 85vh;
-      object-fit: cover;
+    /* Wrapper around video to control size */
+    #videoWrapper {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      user-select: none;
+      width: 70vw;
+      height: 70vh;
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+      transition: width 1.5s ease-in-out, height 1.5s ease-in-out;
       cursor: pointer;
       z-index: 1;
-      transition: transform 0.1s ease-in-out;
     }
 
-    /* Cinematic widescreen aspect ratio after zoom */
-    .cinematic {
-      width: 100vw !important;
-      height: 42.5vw !important; /* approx 2.35:1 aspect ratio */
-      max-height: 100vh !important;
-      object-fit: cover !important;
-      transition: all 1.5s ease-in-out !important;
+    /* Video fills wrapper fully */
+    #videoWrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      user-select: none;
+      transition: transform 0.1s ease-in-out;
+      display: block;
+    }
+
+    /* Cinematic widescreen aspect ratio */
+    #videoWrapper.cinematic {
+      width: 100vw;
+      height: 42.5vw; /* approx 2.35:1 aspect ratio */
+      max-height: 100vh;
     }
 
     #clickOverlay {
@@ -56,14 +64,17 @@
   </style>
 </head>
 <body>
-  <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
-    <source src="media_asset" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
+  <div id="videoWrapper">
+    <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
+      <source src="media_asset" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
 
   <div id="clickOverlay">Click anywhere to enjoy the full experience</div>
 
   <script>
+    const videoWrapper = document.getElementById('videoWrapper');
     const video = document.getElementById('video');
     const overlay = document.getElementById('clickOverlay');
     let unmuted = false;
@@ -71,27 +82,22 @@
     // Toggle cinematic effect here: true = ON, false = OFF
     const enableCinematic = true;
 
-    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-    const isEdge = /Edg/.test(navigator.userAgent);
-    const isFirefox = typeof InstallTrigger !== 'undefined';
-
     function triggerZoom(times) {
       let count = 0;
       const interval = setInterval(() => {
-        video.style.transform = 'translate(-50%, -50%) scale(10)';
+        video.style.transform = 'scale(10)';
         setTimeout(() => {
-          video.style.transform = 'translate(-50%, -50%) scale(1)';
+          video.style.transform = 'scale(1)';
         }, 100); // zoom in duration: 100ms
 
         count++;
         if (count >= times) {
           clearInterval(interval);
 
-          // Apply cinematic effect after zoom if enabled
           if (enableCinematic) {
             setTimeout(() => {
-              video.classList.add('cinematic');
-            }, 300); // small delay after zoom ends
+              videoWrapper.classList.add('cinematic');
+            }, 300);
           }
         }
       }, 500); // run every 500ms (total 2s if 4 times)
@@ -108,14 +114,8 @@
       }
     }
 
-    if (isChrome || isEdge || isFirefox) {
-      video.addEventListener('click', activateAudio);
-      overlay.addEventListener('click', activateAudio);
-    } else {
-      document.addEventListener('mousemove', activateAudio, { once: true });
-      document.addEventListener('click', activateAudio, { once: true });
-      overlay.style.display = 'none';
-    }
+    videoWrapper.addEventListener('click', activateAudio);
+    overlay.addEventListener('click', activateAudio);
   </script>
 </body>
 </html>
