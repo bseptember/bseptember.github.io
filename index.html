@@ -1,6 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Loading...</title>
+  <style>
+    /* Optional: hide controls, disable right-click */
+    video {
+      width: 100%;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -o-user-select: none;
+    }
+  </style>
+</head>
 <body>
-    <img src="findme.png" alt="Description of the image">
+  <video autoplay loop muted playsinline oncontextmenu="return false;">
+    <source src="media_asset" type="video/mp4" />
+    Sorry, your browser doesn't support embedded videos.
+  </video>
+
+  <script>
+    // Change page title, hide any direct video references in JS
+    const pageTitle = "Loading...";
+
+    function setTitle() {
+      document.title = pageTitle;
+    }
+
+    window.onload = setTitle;
+  </script>
 </body>
 </html>
