@@ -52,51 +52,35 @@
 
   <div id="clickOverlay">Click anywhere to enjoy the full experience</div>
 
-  <script>
-    const video = document.getElementById('video');
-    const overlay = document.getElementById('clickOverlay');
-    let unmuted = false;
+<script>
+  const video = document.getElementById('video');
+  const overlay = document.getElementById('clickOverlay');
+  let unmuted = false;
 
-    // Browser detection
-    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-    const isEdge = /Edg/.test(navigator.userAgent);
-    const isFirefox = typeof InstallTrigger !== 'undefined';
+  const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+  const isEdge = /Edg/.test(navigator.userAgent);
+  const isFirefox = typeof InstallTrigger !== 'undefined';
 
-    function activateAudio() {
-      if (!unmuted) {
-        video.muted = false;
-        video.volume = 1.0;
-        video.play().catch(console.warn);
-        unmuted = true;
-        overlay.style.display = 'none';
-      }
-    }
-
-    if (isChrome || isEdge || isFirefox) {
-      overlay.addEventListener('click', activateAudio);
-    } else {
-      document.addEventListener('mousemove', activateAudio, { once: true });
-      document.addEventListener('click', activateAudio, { once: true });
+  function activateAudio() {
+    if (!unmuted) {
+      video.muted = false;
+      video.volume = 1.0;
+      video.play().catch(console.warn);
+      unmuted = true;
       overlay.style.display = 'none';
     }
+  }
 
-    // Animate overlay horizontally back and forth
-    let posX = 0;
-    let direction = 1; // 1 = moving right, -1 = moving left
-
-    function animateOverlay() {
-      const maxX = window.innerWidth - overlay.offsetWidth;
-      posX += direction * 1; // 1px per frame = slow movement
-
-      if (posX >= maxX) direction = -1;
-      else if (posX <= 0) direction = 1;
-
-      overlay.style.left = posX + 'px';
-
-      requestAnimationFrame(animateOverlay);
-    }
-
-    animateOverlay();
-  </script>
+  if (isChrome || isEdge || isFirefox) {
+    // Add click listener on both video and overlay
+    video.addEventListener('click', activateAudio);
+    overlay.addEventListener('click', activateAudio);
+  } else {
+    document.addEventListener('mousemove', activateAudio, { once: true });
+    document.addEventListener('click', activateAudio, { once: true });
+    overlay.style.display = 'none';
+  }
+</script>
+  
 </body>
 </html>
