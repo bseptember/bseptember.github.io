@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Loading...</title>
   <style>
     html, body {
@@ -11,51 +11,40 @@
       background: black;
       overflow: hidden;
     }
-
     video {
+      position: fixed;
+      top: 0; left: 0;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none; /* Prevent hover/interaction causing stop */
     }
   </style>
 </head>
 <body>
-  <video id="rickVideo" autoplay muted playsinline loop oncontextmenu="return false">
-    <source src="media_asset" type="video/mp4" />
+  <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
+    <source src="media_asset" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
   <script>
-    const video = document.getElementById('rickVideo');
-    let hasInteracted = false;
+    const video = document.getElementById('video');
+    let unmuted = false;
 
-    function unmuteOnce() {
-      if (!hasInteracted) {
-        try {
-          video.muted = false;
-          video.volume = 1.0;
-          video.play();
-          hasInteracted = true;
-
-          // Remove the event listeners after first interaction
-          window.removeEventListener('mousemove', unmuteOnce);
-          window.removeEventListener('click', unmuteOnce);
-        } catch (e) {
-          console.warn("Autoplay with audio failed:", e);
-        }
+    function activateAudio() {
+      if (!unmuted) {
+        video.muted = false;
+        video.volume = 1.0;
+        video.play().catch(console.warn);
+        unmuted = true;
+        document.removeEventListener('mousemove', activateAudio);
+        document.removeEventListener('click', activateAudio);
       }
     }
 
-    // Set title
-    document.title = "Loading...";
-
-    // Unmute only on user interaction (required by autoplay policy)
-    window.addEventListener('mousemove', unmuteOnce, { once: true });
-    window.addEventListener('click', unmuteOnce, { once: true });
+    // Autoplay video (loop) begins muted
+    // Unmute on first mouse move or click anywhere in the window
+    document.addEventListener('mousemove', activateAudio, { once: true });
+    document.addEventListener('click', activateAudio, { once: true });
   </script>
 </body>
 </html>
