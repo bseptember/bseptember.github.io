@@ -21,19 +21,17 @@
       user-select: none;
       cursor: pointer;
       z-index: 1;
-      transition: transform 0.1s ease-in-out /*, all 1.5s ease-in-out*/; /* cinematic transition commented */
+      transition: transform 0.1s ease-in-out;
     }
 
     /* Cinematic widescreen aspect ratio after zoom */
-    /*
-    video.cinematic {
-      width: 100vw;
-      height: 42.5vw; /* approx 2.35:1 aspect ratio */
-      max-height: 100vh;
-      object-fit: cover;
-      transition: all 1.5s ease-in-out;
+    .cinematic {
+      width: 100vw !important;
+      height: 42.5vw !important; /* approx 2.35:1 aspect ratio */
+      max-height: 100vh !important;
+      object-fit: cover !important;
+      transition: all 1.5s ease-in-out !important;
     }
-    */
 
     #clickOverlay {
       position: fixed;
@@ -70,6 +68,9 @@
     const overlay = document.getElementById('clickOverlay');
     let unmuted = false;
 
+    // Toggle cinematic effect here: true = ON, false = OFF
+    const enableCinematic = true;
+
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     const isEdge = /Edg/.test(navigator.userAgent);
     const isFirefox = typeof InstallTrigger !== 'undefined';
@@ -85,14 +86,15 @@
         count++;
         if (count >= times) {
           clearInterval(interval);
-          // After last zoom, apply cinematic mode with smooth transition
-          /*
-          setTimeout(() => {
-            video.classList.add('cinematic');
-          }, 300);
-          */
+
+          // Apply cinematic effect after zoom if enabled
+          if (enableCinematic) {
+            setTimeout(() => {
+              video.classList.add('cinematic');
+            }, 300); // small delay after zoom ends
+          }
         }
-      }, 300); // zoom cycles every 300ms (fast & snappy)
+      }, 500); // run every 500ms (total 2s if 4 times)
     }
 
     function activateAudio() {
@@ -102,7 +104,7 @@
         video.play().catch(console.warn);
         unmuted = true;
         overlay.style.display = 'none';
-        triggerZoom(3); // 3 zoom cycles
+        triggerZoom(4); // 4 times for 2 seconds total
       }
     }
 
