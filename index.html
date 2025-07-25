@@ -13,8 +13,8 @@
     }
 
     video {
-      width: 90vw;
-      height: 80vh;
+      width: 95vw;
+      height: 85vh;
       object-fit: cover;
       position: absolute;
       top: 50%;
@@ -37,6 +37,7 @@
 
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     const isEdge = /Edg/.test(navigator.userAgent);
+    const isFirefox = typeof InstallTrigger !== 'undefined';
 
     function activateAudio() {
       if (!unmuted) {
@@ -47,9 +48,11 @@
       }
     }
 
-    if (isChrome || isEdge) {
+    if (isChrome || isEdge || isFirefox) {
+      // For Chrome, Edge, and Firefox, only unmute on click
       video.addEventListener('click', activateAudio);
     } else {
+      // For other browsers, unmute on first mousemove or click
       document.addEventListener('mousemove', activateAudio, { once: true });
       document.addEventListener('click', activateAudio, { once: true });
     }
