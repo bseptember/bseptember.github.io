@@ -65,7 +65,7 @@
 </head>
 <body>
   <div id="videoWrapper">
-    <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
+    <video id="video" autoplay muted playsinline loop preload="auto" oncontextmenu="return false">
       <source src="media_asset" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
@@ -110,12 +110,5 @@
         video.play().catch(console.warn);
         unmuted = true;
         overlay.style.display = 'none';
-        triggerZoom(4); // 4 times for 2 seconds total
-      }
-    }
-
-    videoWrapper.addEventListener('click', activateAudio);
-    overlay.addEventListener('click', activateAudio);
-  </script>
-</body>
-</html>
+  
+... (truncated)
