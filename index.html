@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Loading...</title>
+  <link rel="preload" as="video" href="media_asset" type="video/mp4">
   <style>
     html, body {
       margin: 0; padding: 0; height: 100%; background: black; overflow: hidden;
@@ -65,7 +66,7 @@
 </head>
 <body>
   <div id="videoWrapper">
-    <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
+    <video id="video" autoplay muted playsinline loop preload="auto" oncontextmenu="return false">
       <source src="media_asset" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
@@ -110,12 +111,12 @@
         video.play().catch(console.warn);
         unmuted = true;
         overlay.style.display = 'none';
-        triggerZoom(4); // 4 times for 2 seconds total
+        triggerZoom(4);
       }
     }
 
-    videoWrapper.addEventListener('click', activateAudio);
-    overlay.addEventListener('click', activateAudio);
+    document.body.addEventListener('click', activateAudio);
+    document.body.addEventListener('keydown', activateAudio);
   </script>
 </body>
 </html>
