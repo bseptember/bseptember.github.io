@@ -1,121 +1,724 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Loading...</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Security headers via meta -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; media-src 'self'; img-src 'self' data:; font-src 'self' data:;">
+  <meta name="referrer" content="no-referrer">
+
+  <!-- SEO / Social disguise — looks like a legit link -->
+  <title>You Won a Free Gift Card!</title>
+  <meta name="description" content="Congratulations! You have been selected for an exclusive reward. Click to claim your prize now.">
+  <meta property="og:title" content="You Won a Free Gift Card!">
+  <meta property="og:description" content="Congratulations! You have been selected. Click to claim your prize.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bseptember.github.io">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="You Won a Free Gift Card!">
+  <meta name="twitter:description" content="Congratulations! Click to claim your exclusive reward.">
+  <meta name="theme-color" content="#0a0a0f">
+
+  <!-- Preload the video for fast start -->
+  <link rel="preload" href="media_asset" as="video" type="video/mp4">
+  <link rel="dns-prefetch" href="https://bseptember.github.io">
+
   <style>
+    /* ===== CSS Reset & Base ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --neon-cyan: #00f0ff;
+      --neon-magenta: #ff00e5;
+      --neon-gold: #ffd700;
+      --bg-dark: #0a0a0f;
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.08);
+    }
+
     html, body {
-      margin: 0; padding: 0; height: 100%; background: black; overflow: hidden;
-      display: flex; justify-content: center; align-items: center;
-      color: white; font-family: Arial, sans-serif;
-    }
-
-    /* Wrapper around video to control size */
-    #videoWrapper {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 70vw;
-      height: 70vh;
-      transform: translate(-50%, -50%);
+      width: 100%; height: 100%;
+      background: var(--bg-dark);
       overflow: hidden;
-      transition: width 1.5s ease-in-out, height 1.5s ease-in-out;
-      cursor: pointer;
-      z-index: 1;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: #e0e0e0;
+      -webkit-font-smoothing: antialiased;
+      cursor: default;
     }
 
-    /* Video fills wrapper fully */
-    #videoWrapper video {
-      width: 100%;
-      height: 100%;
+    /* ===== Animated background grid ===== */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridScroll 20s linear infinite;
+    }
+    @keyframes gridScroll {
+      to { background-position: 60px 60px; }
+    }
+
+    /* ===== Floating orbs ===== */
+    .orb {
+      position: fixed; border-radius: 50%; filter: blur(80px);
+      opacity: 0.35; z-index: 0; pointer-events: none;
+      animation: orbFloat 8s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--neon-cyan); top: -10%; left: -5%; animation-duration: 10s; }
+    .orb-2 { width: 350px; height: 350px; background: var(--neon-magenta); bottom: -10%; right: -5%; animation-duration: 12s; animation-delay: -4s; }
+    .orb-3 { width: 250px; height: 250px; background: var(--neon-gold); top: 50%; left: 60%; animation-duration: 14s; animation-delay: -2s; opacity: 0.2; }
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, -40px) scale(1.15); }
+    }
+
+    /* ===== Particle canvas ===== */
+    #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* ===== Intro overlay (disguise) ===== */
+    #introOverlay {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+      cursor: pointer; user-select: none;
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #introOverlay.hidden {
+      opacity: 0; transform: scale(1.1);
+      pointer-events: none;
+    }
+
+    .intro-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1.2rem; margin-bottom: 1.5rem;
+      border-radius: 50px;
+      background: rgba(0,240,255,0.08);
+      border: 1px solid rgba(0,240,255,0.25);
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--neon-cyan);
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+    .intro-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--neon-cyan);
+      animation: dotBlink 1s ease-in-out infinite;
+    }
+    @keyframes badgePulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+    @keyframes dotBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .intro-title {
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      font-weight: 800; letter-spacing: -1px;
+      text-align: center; line-height: 1.1;
+      background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 50%, var(--neon-magenta) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: titleShimmer 3s ease-in-out infinite;
+      background-size: 200% 200%;
+    }
+    @keyframes titleShimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .intro-subtitle {
+      margin-top: 1rem; font-size: clamp(0.9rem, 2vw, 1.3rem);
+      color: rgba(255,255,255,0.5); text-align: center;
+      max-width: 500px; line-height: 1.5;
+    }
+
+    .intro-btn {
+      margin-top: 2.5rem; padding: 1rem 3rem;
+      border: none; border-radius: 50px; cursor: pointer;
+      font-size: 1.1rem; font-weight: 700; letter-spacing: 1px;
+      color: #0a0a0f;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+      box-shadow: 0 0 30px rgba(0,240,255,0.3), 0 0 60px rgba(255,0,229,0.15);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .intro-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 40px rgba(0,240,255,0.5), 0 0 80px rgba(255,0,229,0.25);
+    }
+    .intro-btn::after {
+      content: ''; position: absolute; inset: -2px;
+      border-radius: 50px; z-index: -1;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+      filter: blur(15px); opacity: 0.4;
+    }
+
+    .intro-hint {
+      margin-top: 1.2rem; font-size: 0.75rem;
+      color: rgba(255,255,255,0.25); letter-spacing: 1px;
+    }
+
+    /* Typing dots animation on intro */
+    .typing-dots { display: inline-flex; gap: 4px; margin-left: 6px; }
+    .typing-dots span {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      animation: typingBounce 1.2s ease-in-out infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* ===== Main video stage ===== */
+    #stage {
+      position: fixed; inset: 0; z-index: 1;
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; transition: opacity 1.2s ease;
+    }
+    #stage.active { opacity: 1; }
+
+    /* Glassmorphism video frame */
+    .video-frame {
+      position: relative;
+      width: 75vw; max-width: 960px;
+      aspect-ratio: 16 / 9;
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        0 0 0 1px rgba(0,240,255,0.05),
+        0 8px 32px rgba(0,0,0,0.6),
+        0 0 60px rgba(0,240,255,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 1.5s ease;
+      transform: perspective(1000px) rotateX(0deg);
+    }
+    .video-frame:hover {
+      box-shadow:
+        0 0 0 1px rgba(0,240,255,0.1),
+        0 16px 48px rgba(0,0,0,0.7),
+        0 0 80px rgba(0,240,255,0.12),
+        0 0 120px rgba(255,0,229,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .video-frame.cinematic {
+      width: 100vw; max-width: 100vw;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* Animated gradient border */
+    .video-frame::before {
+      content: ''; position: absolute; inset: -2px;
+      border-radius: 22px; z-index: -1;
+      background: conic-gradient(from 0deg, var(--neon-cyan), var(--neon-magenta), var(--neon-gold), var(--neon-cyan));
+      animation: borderSpin 4s linear infinite;
+      opacity: 0.3;
+    }
+    .video-frame.cinematic::before { display: none; }
+    @keyframes borderSpin { to { transform: rotate(360deg); } }
+
+    /* Scanlines overlay for retro vibe */
+    .video-frame::after {
+      content: ''; position: absolute; inset: 0; z-index: 3;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      border-radius: 20px;
+    }
+
+    .video-frame video {
+      width: 100%; height: 100%;
       object-fit: cover;
-      user-select: none;
-      transition: transform 0.1s ease-in-out;
       display: block;
-    }
-
-    /* Cinematic widescreen aspect ratio */
-    #videoWrapper.cinematic {
-      width: 100vw;
-      height: 42.5vw; /* approx 2.35:1 aspect ratio */
-      max-height: 100vh;
-    }
-
-    #clickOverlay {
-      position: fixed;
-      top: 10%;
-      left: 0;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      padding: 1rem 2rem;
-      font-size: clamp(1rem, 2vw, 2rem);
-      border-radius: 8px;
-      white-space: nowrap;
-      z-index: 2;
-      cursor: pointer;
-      animation: moveText 10s linear infinite;
       user-select: none;
+      transition: transform 0.15s ease-out;
     }
 
-    @keyframes moveText {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(100vw); }
+    /* Corner accents */
+    .corner {
+      position: absolute; width: 20px; height: 20px;
+      z-index: 4; pointer-events: none;
+      opacity: 0.4;
     }
-  </style>
-</head>
-<body>
-  <div id="videoWrapper">
-    <video id="video" autoplay muted playsinline loop oncontextmenu="return false">
-      <source src="media_asset" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-  </div>
+    .corner::before, .corner::after {
+      content: ''; position: absolute;
+      background: var(--neon-cyan);
+    }
+    .corner-tl { top: 8px; left: 8px; }
+    .corner-tl::before { width: 20px; height: 2px; top: 0; left: 0; }
+    .corner-tl::after { width: 2px; height: 20px; top: 0; left: 0; }
+    .corner-tr { top: 8px; right: 8px; }
+    .corner-tr::before { width: 20px; height: 2px; top: 0; right: 0; }
+    .corner-tr::after { width: 2px; height: 20px; top: 0; right: 0; }
+    .corner-bl { bottom: 8px; left: 8px; }
+    .corner-bl::before { width: 20px; height: 2px; bottom: 0; left: 0; }
+    .corner-bl::after { width: 2px; height: 20px; bottom: 0; left: 0; }
+    .corner-br { bottom: 8px; right: 8px; }
+    .corner-br::before { width: 20px; height: 2px; bottom: 0; right: 0; }
+    .corner-br::after { width: 2px; height: 20px; bottom: 0; right: 0; }
+    .video-frame.cinematic .corner { display: none; }
 
-  <div id="clickOverlay">Click anywhere to enjoy the full experience</div>
-
-  <script>
-    const videoWrapper = document.getElementById('videoWrapper');
-    const video = document.getElementById('video');
-    const overlay = document.getElementById('clickOverlay');
-    let unmuted = false;
-
-    // Toggle cinematic effect here: true = ON, false = OFF
-    const enableCinematic = true;
-
-    function triggerZoom(times) {
-      let count = 0;
-      const interval = setInterval(() => {
-        video.style.transform = 'scale(10)';
-        setTimeout(() => {
-          video.style.transform = 'scale(1)';
-        }, 100); // zoom in duration: 100ms
-
-        count++;
-        if (count >= times) {
-          clearInterval(interval);
-
-          if (enableCinematic) {
-            setTimeout(() => {
-              videoWrapper.classList.add('cinematic');
-            }, 300);
-          }
-        }
-      }, 500); // run every 500ms (total 2s if 4 times)
+    /* ===== Now Playing bar (glassmorphism) ===== */
+    .now-playing {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      z-index: 10;
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none; white-space: nowrap;
+    }
+    .now-playing.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    .now-playing.hide-cinematic {
+      transform: translateX(-50%) translateY(100px);
     }
 
-    function activateAudio() {
-      if (!unmuted) {
-        video.muted = false;
-        video.volume = 1.0;
-        video.play().catch(console.warn);
-        unmuted = true;
-        overlay.style.display = 'none';
-        triggerZoom(4); // 4 times for 2 seconds total
+    /* Equalizer bars */
+    .eq-bars { display: flex; align-items: flex-end; gap: 2px; height: 20px; }
+    .eq-bars span {
+      width: 3px; border-radius: 2px;
+      background: var(--neon-cyan);
+    }
+    .eq-bars span:nth-child(1) { animation: eqBar 0.5s ease-in-out infinite alternate; }
+    .eq-bars span:nth-child(2) { animation: eqBar 0.7s ease-in-out infinite alternate; animation-delay: 0.1s; }
+    .eq-bars span:nth-child(3) { animation: eqBar 0.4s ease-in-out infinite alternate; animation-delay: 0.2s; }
+    .eq-bars span:nth-child(4) { animation: eqBar 0.6s ease-in-out infinite alternate; animation-delay: 0.05s; }
+    .eq-bars span:nth-child(5) { animation: eqBar 0.55s ease-in-out infinite alternate; animation-delay: 0.15s; }
+    @keyframes eqBar {
+      0% { height: 4px; }
+      100% { height: 20px; }
+    }
+    .eq-bars.paused span { animation-play-state: paused; height: 4px; }
+
+    .np-info { display: flex; flex-direction: column; }
+    .np-title {
+      font-size: 0.85rem; font-weight: 700; color: #fff;
+      overflow: hidden; max-width: 200px;
+    }
+    .np-title span {
+      display: inline-block;
+      animation: npScroll 8s linear infinite;
+    }
+    @keyframes npScroll {
+      0%, 20% { transform: translateX(0); }
+      80%, 100% { transform: translateX(-100%); }
+    }
+    .np-artist { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+
+    /* Fake progress bar */
+    .np-progress {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: rgba(255,255,255,0.05); border-radius: 0 0 16px 16px;
+      overflow: hidden;
+    }
+    .np-progress-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+      transition: width 0.3s linear;
+    }
+
+    /* ===== Status indicator (top-right) ===== */
+    .status-pill {
+      position: fixed; top: 20px; right: 20px; z-index: 10;
+      display: flex; align-items: center; gap: 6px;
+      padding: 0.4rem 0.8rem;
+      border-radius: 50px;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.7rem; color: rgba(255,255,255,0.4);
+      letter-spacing: 1px; text-transform: uppercase;
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .status-pill.visible { opacity: 1; }
+    .status-pill .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #ff4444;
+      animation: livePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes livePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,68,68,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(255,68,68,0); }
+    }
+
+    /* ===== Audio waveform visualiser ring ===== */
+    #visualizer {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: 0;
+      transition: opacity 1s ease;
+    }
+    #visualizer.active { opacity: 1; }
+
+    /* ===== Vignette ===== */
+    .vignette {
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+    }
+
+    /* ===== Toast notification ===== */
+    .toast {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      z-index: 50;
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.8rem; color: rgba(255,255,255,0.7);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+    .toast.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .video-frame { width: 92vw; border-radius: 14px; }
+      .video-frame::before { border-radius: 16px; }
+      .now-playing { padding: 0.6rem 1rem; gap: 0.7rem; }
+      .intro-title { padding: 0 1rem; }
+      .intro-subtitle { padding: 0 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      .video-frame { width: 98vw; border-radius: 10px; }
+      .corner { display: none; }
+      .now-playing { bottom: 12px; }
+    }
+
+    /* ===== Reduced motion ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
       }
     }
 
-    videoWrapper.addEventListener('click', activateAudio);
-    overlay.addEventListener('click', activateAudio);
+    /* ===== Print ===== */
+    @media print { body { display: none; } }
+  </style>
+</head>
+<body>
+
+  <!-- Background layers -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="orb orb-1" aria-hidden="true"></div>
+  <div class="orb orb-2" aria-hidden="true"></div>
+  <div class="orb orb-3" aria-hidden="true"></div>
+  <canvas id="particles" aria-hidden="true"></canvas>
+  <canvas id="visualizer" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- Intro disguise overlay -->
+  <div id="introOverlay" role="button" tabindex="0" aria-label="Click to continue">
+    <div class="intro-badge">
+      <span class="dot"></span>
+      Exclusive Content
+    </div>
+    <h1 class="intro-title">Something Special<br>Awaits You</h1>
+    <p class="intro-subtitle">
+      Your friend shared this with you. Tap below to reveal what's waiting
+      <span class="typing-dots"><span></span><span></span><span></span></span>
+    </p>
+    <button class="intro-btn" type="button">Reveal Now</button>
+    <p class="intro-hint">100% free &bull; no signup required</p>
+  </div>
+
+  <!-- Video stage -->
+  <div id="stage" aria-label="Video player">
+    <div class="video-frame" id="videoFrame">
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+      <video id="video" preload="auto" autoplay muted playsinline loop
+             disablepictureinpicture controlslist="nodownload nofullscreen"
+             oncontextmenu="return false" aria-label="Video content">
+        <source src="media_asset" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <!-- Now-playing bar -->
+  <div class="now-playing" id="nowPlaying" aria-label="Now playing information">
+    <div class="eq-bars paused" id="eqBars">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="np-info">
+      <div class="np-title"><span>Rick Astley - Never Gonna Give You Up</span></div>
+      <div class="np-artist">Official Music Video</div>
+    </div>
+    <div class="np-progress"><div class="np-progress-bar" id="progressBar"></div></div>
+  </div>
+
+  <!-- Status pill -->
+  <div class="status-pill" id="statusPill" aria-hidden="true">
+    <span class="live-dot"></span>
+    Streaming
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <script>
+    /* ===== Strict mode ===== */
+    'use strict';
+
+    /* ===== DOM refs ===== */
+    const $ = (s) => document.querySelector(s);
+    const intro     = $('#introOverlay');
+    const stage     = $('#stage');
+    const frame     = $('#videoFrame');
+    const video     = $('#video');
+    const eqBars    = $('#eqBars');
+    const nowPlaying = $('#nowPlaying');
+    const statusPill = $('#statusPill');
+    const toast     = $('#toast');
+    const progressBar = $('#progressBar');
+    const particleCvs = $('#particles');
+    const vizCvs      = $('#visualizer');
+
+    let audioActive = false;
+    let cinematicMode = false;
+
+    /* ===== Particles ===== */
+    (function initParticles() {
+      const ctx = particleCvs.getContext('2d');
+      let w, h, particles = [];
+      const COUNT = Math.min(80, Math.floor(window.innerWidth / 20));
+
+      function resize() {
+        w = particleCvs.width = window.innerWidth;
+        h = particleCvs.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize, { passive: true });
+
+      for (let i = 0; i < COUNT; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          r: Math.random() * 1.5 + 0.5,
+          o: Math.random() * 0.3 + 0.05
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (const p of particles) {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0,240,255,${p.o})`;
+          ctx.fill();
+        }
+
+        /* Draw connections */
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = dx * dx + dy * dy;
+            if (dist < 12000) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(0,240,255,${0.03 * (1 - dist / 12000)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    /* ===== Audio visualiser ring ===== */
+    let analyser, vizCtx, vizW, vizH;
+    function initVisualizer() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(video);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        vizCtx = vizCvs.getContext('2d');
+        function vizResize() {
+          vizW = vizCvs.width = window.innerWidth;
+          vizH = vizCvs.height = window.innerHeight;
+        }
+        vizResize();
+        window.addEventListener('resize', vizResize, { passive: true });
+        vizCvs.classList.add('active');
+        drawViz();
+      } catch (e) { /* AudioContext not available — graceful fallback */ }
+    }
+
+    function drawViz() {
+      if (!analyser) return;
+      requestAnimationFrame(drawViz);
+      const bufferLength = analyser.frequencyBinCount;
+      const data = new Uint8Array(bufferLength);
+      analyser.getByteFrequencyData(data);
+
+      vizCtx.clearRect(0, 0, vizW, vizH);
+      const cx = vizW / 2, cy = vizH / 2;
+      const baseR = Math.min(vizW, vizH) * 0.38;
+
+      for (let i = 0; i < bufferLength; i++) {
+        const angle = (i / bufferLength) * Math.PI * 2 - Math.PI / 2;
+        const amp = data[i] / 255;
+        const r = baseR + amp * 60;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        const x2 = cx + Math.cos(angle) * baseR;
+        const y2 = cy + Math.sin(angle) * baseR;
+
+        vizCtx.beginPath();
+        vizCtx.moveTo(x2, y2);
+        vizCtx.lineTo(x, y);
+        const hue = 180 + (i / bufferLength) * 100;
+        vizCtx.strokeStyle = `hsla(${hue}, 100%, 60%, ${0.15 + amp * 0.3})`;
+        vizCtx.lineWidth = 2;
+        vizCtx.stroke();
+      }
+    }
+
+    /* ===== Toast system ===== */
+    let toastTimer;
+    function showToast(msg, duration) {
+      duration = duration || 3000;
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('visible'), duration);
+    }
+
+    /* ===== Progress bar ===== */
+    function updateProgress() {
+      if (video.duration) {
+        const pct = (video.currentTime / video.duration) * 100;
+        progressBar.style.width = pct + '%';
+      }
+      requestAnimationFrame(updateProgress);
+    }
+
+    /* ===== Zoom effect ===== */
+    function triggerZoom(times, cb) {
+      let count = 0;
+      const interval = setInterval(() => {
+        video.style.transform = 'scale(8)';
+        setTimeout(() => { video.style.transform = 'scale(1)'; }, 100);
+        count++;
+        if (count >= times) {
+          clearInterval(interval);
+          if (cb) setTimeout(cb, 400);
+        }
+      }, 400);
+    }
+
+    /* ===== Cinematic mode ===== */
+    function enterCinematic() {
+      cinematicMode = true;
+      frame.classList.add('cinematic');
+      nowPlaying.classList.add('hide-cinematic');
+      statusPill.classList.remove('visible');
+      showToast('Cinematic Mode', 2000);
+    }
+
+    /* ===== Main activate ===== */
+    function activate() {
+      /* Dismiss intro */
+      intro.classList.add('hidden');
+      stage.classList.add('active');
+
+      /* Unmute */
+      video.muted = false;
+      video.volume = 1.0;
+      video.play().catch(function() {
+        /* Autoplay with sound blocked — keep muted play */
+        video.muted = true;
+        video.play();
+        audioActive = false;
+      });
+
+      if (!video.muted) {
+        audioActive = true;
+        initVisualizer();
+      }
+
+      /* Show UI */
+      eqBars.classList.remove('paused');
+      setTimeout(function() { nowPlaying.classList.add('visible'); }, 600);
+      setTimeout(function() { statusPill.classList.add('visible'); }, 1200);
+
+      /* Toasts sequence */
+      setTimeout(function() { showToast('Now Playing...', 2500); }, 800);
+      setTimeout(function() { showToast('You just got Rickrolled!', 4000); }, 4000);
+
+      /* Zoom then cinematic */
+      setTimeout(function() {
+        triggerZoom(3, enterCinematic);
+      }, 9000);
+
+      /* Start progress tracking */
+      updateProgress();
+
+      /* Remove intro from DOM after transition */
+      setTimeout(function() { intro.remove(); }, 1000);
+    }
+
+    /* ===== Event listeners ===== */
+    intro.addEventListener('click', activate);
+    intro.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+    });
+
+    /* If user interacts anywhere after intro (for browsers that blocked audio) */
+    document.addEventListener('click', function reactivate() {
+      if (!audioActive && !video.muted) return;
+      if (audioActive) return;
+      if (document.getElementById('introOverlay')) return; /* intro still showing */
+      video.muted = false;
+      video.volume = 1.0;
+      video.play().then(function() {
+        audioActive = true;
+        eqBars.classList.remove('paused');
+        initVisualizer();
+        showToast('Audio Enabled', 2000);
+        document.removeEventListener('click', reactivate);
+      }).catch(function() {});
+    }, { passive: true });
+
+    /* Video starts muted autoplay immediately for fast first paint */
+    video.play().catch(function() {});
   </script>
 </body>
 </html>
