@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>OAuth Callback</title>
+  <title>Fusion Auth Callback</title>
 </head>
 <body>
   <script>
@@ -11,7 +11,7 @@
     console.log('Authorization code:', code);
 
     // Redirect to your server-side callback URL with the authorization code as a query parameter
-    const serverUrl = 'https://localhost:7094/api/auth/helloworld';
+    const serverUrl = 'https://192.168.8.162:8000/fusion';
     const redirectUrl = `${serverUrl}?code=${code}`;
     window.location.href = redirectUrl;
   </script>
