@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>OAuth Callback</title>
+  <title>Keycloak Auth Callback</title>
 </head>
 <body>
   <script>
@@ -11,7 +11,7 @@
     console.log('Authorization code:', code);
 
     // Redirect to your server-side callback URL with the authorization code as a query parameter
-    const serverUrl = 'http://192.168.8.162:7000/keycloak';
+    const serverUrl = 'https://192.168.8.162:8000/keycloak';
     const redirectUrl = `${serverUrl}?code=${code}`;
     window.location.href = redirectUrl;
   </script>
